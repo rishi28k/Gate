@@ -3,68 +3,907 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1e3a5f">
-<meta name="description" content="GATE study progress tracker">
+<meta name="theme-color" content="#18324a">
+<meta name="description" content="GATE Progress Tracker">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg">
 <title>GATE Progress Tracker</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f3f6fa;color:#172033}
-header{position:sticky;top:0;z-index:5;background:#f3f6fa;padding:12px;max-width:720px;margin:auto}
-h1{font-size:24px;margin:4px 0 10px}.card{background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px #0001}
-.stats{display:flex;justify-content:space-between;color:#5b6472;font-size:14px}.bar{height:9px;background:#e1e6ed;border-radius:99px;overflow:hidden;margin:9px 0}.fill{height:100%;width:0;background:#2563eb;transition:.2s}
-button{min-height:44px;border:1px solid #d7dde5;background:#fff;border-radius:10px;padding:8px 13px;font-weight:650}
-main{max-width:720px;margin:auto;padding:0 12px 30px}.subject{background:#fff;border-radius:16px;overflow:hidden;margin:12px 0;box-shadow:0 2px 10px #0000000d}
-.subject h2{font-size:17px;margin:0;padding:13px 14px;background:#334e68;color:white}
-.topic{display:flex;align-items:center;gap:12px;padding:11px 14px;border-top:1px solid #edf0f3;min-height:49px}
-.topic input{width:22px;height:22px;accent-color:#2563eb}.topic.done span{text-decoration:line-through;color:#8a93a3}
-.small{font-size:13px;color:#667085;margin-top:4px}
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:#f4f7fa;
+    color:#14202b;
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:#f4f7fa;
+    padding:10px 12px 12px;
+    max-width:760px;
+    margin:auto;
+}
+
+.card{
+    background:#fff;
+    border:1px solid #e1e7ed;
+    border-radius:18px;
+    padding:14px;
+    box-shadow:0 3px 14px #0000000b;
+}
+
+h1{
+    font-size:23px;
+    margin:2px 0 3px;
+}
+
+.sub{
+    font-size:13px;
+    color:#697586;
+}
+
+.stats{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    margin-top:12px;
+    font-size:14px;
+    font-weight:650;
+}
+
+.bar{
+    height:9px;
+    background:#e5e9ee;
+    border-radius:99px;
+    overflow:hidden;
+    margin-top:8px;
+}
+
+.fill{
+    height:100%;
+    width:0;
+    background:#2563eb;
+    transition:width .25s;
+}
+
+.actions{
+    display:flex;
+    gap:8px;
+    margin-top:11px;
+}
+
+.actions button{
+    flex:1;
+}
+
+button{
+    min-height:44px;
+    border:1px solid #d8e0e8;
+    background:#fff;
+    border-radius:11px;
+    padding:8px 12px;
+    font-weight:650;
+    color:#14202b;
+}
+
+button.primary{
+    background:#2563eb;
+    color:#fff;
+    border-color:#2563eb;
+}
+
+.search{
+    width:100%;
+    margin-top:10px;
+    border:1px solid #d8e0e8;
+    border-radius:11px;
+    padding:12px 13px;
+    font-size:16px;
+    outline:none;
+    background:#fff;
+}
+
+main{
+    max-width:760px;
+    margin:auto;
+    padding:0 12px 35px;
+}
+
+.subject{
+    background:#fff;
+    border:1px solid #e1e7ed;
+    border-radius:17px;
+    overflow:hidden;
+    margin:12px 0;
+}
+
+.subjectHead{
+    padding:13px 14px;
+    background:#304b63;
+    color:#fff;
+}
+
+.subjectTitle{
+    font-weight:750;
+    font-size:16px;
+}
+
+.subjectProgress{
+    font-size:12px;
+    opacity:.9;
+    margin-top:3px;
+}
+
+.topic{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 13px;
+    border-top:1px solid #edf0f3;
+    min-height:54px;
+    cursor:pointer;
+}
+
+.topic:active{
+    background:#f5f8fb;
+}
+
+.check{
+    width:23px;
+    height:23px;
+    border:2px solid #aab5c1;
+    border-radius:7px;
+    display:grid;
+    place-items:center;
+    flex:none;
+    background:#fff;
+}
+
+.topic.done .check{
+    background:#2563eb;
+    border-color:#2563eb;
+    color:#fff;
+}
+
+.check:after{
+    content:"✓";
+    font-size:15px;
+    font-weight:800;
+    opacity:0;
+}
+
+.topic.done .check:after{
+    opacity:1;
+}
+
+.topicText{
+    min-width:0;
+    flex:1;
+    font-size:15px;
+}
+
+.topic.done .topicText{
+    text-decoration:line-through;
+    color:#8a95a3;
+}
+
+/* Confirmation popup */
+
+.modalBack{
+    position:fixed;
+    inset:0;
+    background:#0008;
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:30;
+    padding:12px;
+}
+
+.modalBack.show{
+    display:flex;
+}
+
+.modal{
+    width:min(520px,100%);
+    background:#fff;
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 10px 40px #0004;
+}
+
+.modal h2{
+    font-size:19px;
+    margin:0 0 7px;
+}
+
+.modal p{
+    margin:0;
+    color:#667085;
+    font-size:14px;
+    line-height:1.45;
+}
+
+.modalBtns{
+    display:flex;
+    gap:9px;
+    margin-top:17px;
+}
+
+.modalBtns button{
+    flex:1;
+}
+
+@media(min-width:600px){
+
+    .modalBack{
+        align-items:center;
+    }
+
+    .modal{
+        border-radius:20px;
+    }
+}
 </style>
 </head>
+
 <body>
+
 <header>
- <div class="card">
-  <h1>📚 GATE Progress Tracker</h1>
-  <div class="small">Tap a topic when you complete it.</div>
-  <div class="bar"><div class="fill" id="fill"></div></div>
-  <div class="stats"><span id="count">0 / 0 covered</span><span id="pct">0%</span></div>
-  <button id="reset" type="button" style="margin-top:10px">Reset Progress</button>
- </div>
+
+<div class="card">
+
+<h1>📚 GATE Progress Tracker</h1>
+
+<div class="sub">
+Tap a topic to confirm before changing its status.
+</div>
+
+<div class="stats">
+<span id="count">0 / 0 covered</span>
+<span id="pct">0%</span>
+</div>
+
+<div class="bar">
+<div class="fill" id="fill"></div>
+</div>
+
+<input
+    id="search"
+    class="search"
+    type="search"
+    placeholder="🔍 Search topics…"
+>
+
+<div class="actions">
+<button id="reset" type="button">
+Reset all
+</button>
+
+<button id="covered" type="button">
+Show covered
+</button>
+</div>
+
+</div>
+
 </header>
+
 <main id="app"></main>
+
+
+<!-- Confirmation popup -->
+
+<div
+    id="modalBack"
+    class="modalBack"
+    role="dialog"
+    aria-modal="true"
+>
+
+<div class="modal">
+
+<h2 id="modalTitle">
+Change topic status?
+</h2>
+
+<p id="modalText"></p>
+
+<div class="modalBtns">
+
+<button id="cancel" type="button">
+Cancel
+</button>
+
+<button id="confirm" class="primary" type="button">
+Confirm
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
 <script>
-const data={
-"Computer Networks":["IPV4 Addressing","Error Control","Flow Control","IPV4 Header & Fragmentation","TCP & UDP","Medium Access Control","Routing Protocols","Switching","Application Layer Protocols","IP Support protocol","OSI & TCP/Stack Protocol"],
-"Operating Systems":["Introduction & Background","Process Management","CPU Scheduling","Process Synchronization","DeadLock","Memory Management","File System & Device Management","System Calls & Threads"],
-"C - Programming":["Data Types & Operators","Control Flow Statements","Functions & Storage Classes","Arrays & Pointers","Strings","Structures & Union","Miscellaneous Topics"],
-"Data Structures":["Introduction","Arrays","Linked List","Stack & Queues","Trees","Graphs","Hashing"],
-"Digital Logic":["Logic Gates","Minimization","Combinational Circuit","Sequential Circuit","Number System"],
-"Theory of Computation":["Finite Automata","Push Down Automata","Turning Machine Recursively Enumerable","Decidability"],
-"Compiler Design":["Lexical & Syntax Analysis","Syntax Directed Translation","Intermediate Code & Code Optimization"],
-"Algorithms":["Analysis Of Algorithms","Design Strategies","Greedy Method","Dynamic Programming","Graph Algorithms","Heap Algorithms","Backtracking & Branch-Bound"],
-"Database Management System":["FD`s and Normalisation","Transaction and Concurrency Control","ER Model","Query Language","File Organisation & Indexing"],
-"Computer Organisation & Architecture":["Introduction Of COA","Machine Instruction and Addressing Modes","Floating Point Representation","ALU and Control Unit","Instruction And Pipelining","Cache Memory","Secondary Memory & IO Interface"],
-"Discrete Mathematics":["Graph Theory","Mathematical Logic","Set Theory","Combinatorics"],
-"Engineering Mathematics":["Linear Algebra","Calculus","Probability & Statistics"],
-"General Aptitude":["Averages","Percentages","Simple & Compound Intrest","Profit and Loss","Mixtures & Alligations","Ratio and Propotion","Counting Theory","Time and Work","Pipes and Cisterns","Speed, Distance and Time","Boats, Trains, Races","Mensuration 2D, 3D","Geometry","Data Interpretation","Probability","Set Theory","Permutation & Combinations","Calenders","Clocks","Number System","Blood Relations","Coding & Decoding","Directions","Arrangements and Rankings","Cubes & Dices","Venn Digrams","Paper Folding","Image Formations"]};
-const key="gate-progress-v1", saved=JSON.parse(localStorage.getItem(key)||"{}"), app=document.getElementById("app");
-let total=0;
-for(const [subject,topics] of Object.entries(data)){
- const s=document.createElement("section");s.className="subject";
- const h=document.createElement("h2");h.textContent=subject;s.appendChild(h);
- topics.forEach((topic,i)=>{
-  total++;const id=subject+"-"+i;const label=document.createElement("label");label.className="topic";
-  const cb=document.createElement("input");cb.type="checkbox";cb.checked=!!saved[id];
-  const span=document.createElement("span");span.textContent=topic;
-  if(cb.checked)label.classList.add("done");
-  cb.addEventListener("change",()=>{saved[id]=cb.checked;if(cb.checked)label.classList.add("done");else label.classList.remove("done");localStorage.setItem(key,JSON.stringify(saved));update()});
-  label.append(cb,span);s.appendChild(label);
- });app.appendChild(s);
+
+(function(){
+
+const data = {
+
+"Computer Networks":[
+"IPV4 Addressing",
+"Error Control",
+"Flow Control",
+"IPV4 Header & Fragmentation",
+"TCP & UDP",
+"Medium Access Control",
+"Routing Protocols",
+"Switching",
+"Application Layer Protocols",
+"IP Support protocol",
+"OSI & TCP/Stack Protocol"
+],
+
+"Operating Systems":[
+"Introduction & Background",
+"Process Management",
+"CPU Scheduling",
+"Process Synchronization",
+"DeadLock",
+"Memory Management",
+"File System & Device Management",
+"System Calls & Threads"
+],
+
+"C - Programming":[
+"Data Types & Operators",
+"Control Flow Statements",
+"Functions & Storage Classes",
+"Arrays & Pointers",
+"Strings",
+"Structures & Union",
+"Miscellaneous Topics"
+],
+
+"Data Structures":[
+"Introduction",
+"Arrays",
+"Linked List",
+"Stack & Queues",
+"Trees",
+"Graphs",
+"Hashing"
+],
+
+"Digital Logic":[
+"Logic Gates",
+"Minimization",
+"Combinational Circuit",
+"Sequential Circuit",
+"Number System"
+],
+
+"Theory of Computation":[
+"Finite Automata",
+"Push Down Automata",
+"Turning Machine Recursively Enumerable",
+"Decidability"
+],
+
+"Compiler Design":[
+"Lexical & Syntax Analysis",
+"Syntax Directed Translation",
+"Intermediate Code & Code Optimization"
+],
+
+"Algorithms":[
+"Analysis Of Algorithms",
+"Design Strategies",
+"Greedy Method",
+"Dynamic Programming",
+"Graph Algorithms",
+"Heap Algorithms",
+"Backtracking & Branch-Bound"
+],
+
+"Database Management System":[
+"FD`s and Normalisation",
+"Transaction and Concurrency Control",
+"ER Model",
+"Query Language",
+"File Organisation & Indexing"
+],
+
+"Computer Organisation & Architecture":[
+"Introduction Of COA",
+"Machine Instruction and Addressing Modes",
+"Floating Point Representation",
+"ALU and Control Unit",
+"Instruction And Pipelining",
+"Cache Memory",
+"Secondary Memory & IO Interface"
+],
+
+"Discrete Mathematics":[
+"Graph Theory",
+"Mathematical Logic",
+"Set Theory",
+"Combinatorics"
+],
+
+"Engineering Mathematics":[
+"Linear Algebra",
+"Calculus",
+"Probability & Statistics"
+],
+
+"General Aptitude":[
+"Averages",
+"Percentages",
+"Simple & Compound Intrest",
+"Profit and Loss",
+"Mixtures & Alligations",
+"Ratio and Propotion",
+"Counting Theory",
+"Time and Work",
+"Pipes and Cisterns",
+"Speed, Distance and Time",
+"Boats, Trains, Races",
+"Mensuration 2D, 3D",
+"Geometry",
+"Data Interpretation",
+"Probability",
+"Set Theory",
+"Permutation & Combinations",
+"Calenders",
+"Clocks",
+"Number System",
+"Blood Relations",
+"Coding & Decoding",
+"Directions",
+"Arrangements and Rankings",
+"Cubes & Dices",
+"Venn Digrams",
+"Paper Folding",
+"Image Formations"
+]
+
+};
+
+
+const KEY = "gate-progress-v2";
+
+let state = {};
+
+try{
+
+    state = JSON.parse(
+        localStorage.getItem(KEY) || "{}"
+    );
+
+}catch(e){
+
+    state = {};
+
 }
-function update(){const done=Object.values(saved).filter(Boolean).length,p=total?Math.round(done/total*100):0;document.getElementById("count").textContent=`${done} / ${total} covered`;document.getElementById("pct").textContent=p+"%";document.getElementById("fill").style.width=p+"%"}
-document.getElementById("reset").addEventListener("click",()=>{if(confirm("Reset all progress?")){localStorage.removeItem(key);location.reload()}});
-update();
-if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+let pending = null;
+
+let showCovered = false;
+
+let total = 0;
+
+const app = document.getElementById("app");
+
+
+/* Create subjects */
+
+Object.entries(data).forEach(
+([subject,topics]) => {
+
+    const sec = document.createElement("section");
+
+    sec.className = "subject";
+
+    sec.dataset.subject = subject;
+
+
+    const head = document.createElement("div");
+
+    head.className = "subjectHead";
+
+
+    head.innerHTML = `
+        <div class="subjectTitle"></div>
+        <div class="subjectProgress"></div>
+    `;
+
+
+    head.querySelector(".subjectTitle")
+        .textContent = subject;
+
+
+    sec.appendChild(head);
+
+
+    topics.forEach((topic,i)=>{
+
+        total++;
+
+
+        const id = subject + "-" + i;
+
+
+        const row = document.createElement("div");
+
+        row.className = "topic";
+
+        row.dataset.id = id;
+
+        row.dataset.topic =
+            topic.toLowerCase();
+
+
+        const box =
+            document.createElement("div");
+
+        box.className = "check";
+
+
+        const text =
+            document.createElement("div");
+
+        text.className = "topicText";
+
+        text.textContent = topic;
+
+
+        row.append(box,text);
+
+
+        row.addEventListener(
+            "click",
+            ()=>askChange(id,topic)
+        );
+
+
+        sec.appendChild(row);
+
+    });
+
+
+    app.appendChild(sec);
+
+});
+
+
+function isDone(id){
+
+    return state[id] === true;
+
+}
+
+
+/* Ask before changing */
+
+function askChange(id,topic){
+
+    pending = {
+
+        id:id,
+
+        topic:topic,
+
+        next:!isDone(id)
+
+    };
+
+
+    document.getElementById(
+        "modalTitle"
+    ).textContent =
+        pending.next
+        ? "Mark as covered?"
+        : "Remove covered status?";
+
+
+    document.getElementById(
+        "modalText"
+    ).textContent =
+        pending.next
+
+        ? 'Confirm that you have completed "' +
+          topic +
+          '".'
+
+        : 'Are you sure you want to mark "' +
+          topic +
+          '" as not covered?';
+
+
+    document.getElementById(
+        "confirm"
+    ).textContent =
+        pending.next
+        ? "Mark Covered"
+        : "Mark Not Covered";
+
+
+    document
+        .getElementById("modalBack")
+        .classList.add("show");
+
+}
+
+
+function closeModal(){
+
+    pending = null;
+
+    document
+        .getElementById("modalBack")
+        .classList.remove("show");
+
+}
+
+
+/* Cancel */
+
+document
+.getElementById("cancel")
+.addEventListener(
+    "click",
+    closeModal
+);
+
+
+/* Confirm */
+
+document
+.getElementById("confirm")
+.addEventListener(
+"click",
+()=>{
+
+    if(!pending)
+        return;
+
+
+    state[pending.id] =
+        pending.next;
+
+
+    localStorage.setItem(
+        KEY,
+        JSON.stringify(state)
+    );
+
+
+    closeModal();
+
+    render();
+
+});
+
+
+/* Close when clicking outside */
+
+document
+.getElementById("modalBack")
+.addEventListener(
+"click",
+e=>{
+
+    if(e.target.id === "modalBack")
+        closeModal();
+
+});
+
+
+/* ESC key */
+
+document.addEventListener(
+"keydown",
+e=>{
+
+    if(e.key === "Escape")
+        closeModal();
+
+});
+
+
+/* Render progress */
+
+function render(){
+
+    const q =
+        document
+        .getElementById("search")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    let done = 0;
+
+
+    Object.values(state)
+    .forEach(v=>{
+
+        if(v)
+            done++;
+
+    });
+
+
+    const p =
+        total
+        ? Math.round(done / total * 100)
+        : 0;
+
+
+    document.getElementById("count")
+        .textContent =
+        done + " / " + total + " covered";
+
+
+    document.getElementById("pct")
+        .textContent =
+        p + "%";
+
+
+    document.getElementById("fill")
+        .style.width =
+        p + "%";
+
+
+    app.querySelectorAll(
+        ".subject"
+    ).forEach(sec=>{
+
+        let visible = 0;
+
+        let subjectDone = 0;
+
+
+        sec.querySelectorAll(
+            ".topic"
+        ).forEach(row=>{
+
+            const id =
+                row.dataset.id;
+
+            const ok =
+                isDone(id);
+
+
+            const matches =
+                !q ||
+                row.dataset.topic
+                .includes(q);
+
+
+            const filter =
+                !showCovered || ok;
+
+
+            row.classList.toggle(
+                "done",
+                ok
+            );
+
+
+            row.style.display =
+                (matches && filter)
+                ? "flex"
+                : "none";
+
+
+            if(matches && filter)
+                visible++;
+
+
+            if(ok)
+                subjectDone++;
+
+        });
+
+
+        sec.querySelector(
+            ".subjectProgress"
+        ).textContent =
+            subjectDone +
+            " / " +
+            sec.querySelectorAll(
+                ".topic"
+            ).length +
+            " covered";
+
+
+        sec.style.display =
+            visible
+            ? "block"
+            : "none";
+
+    });
+
+}
+
+
+/* Search */
+
+document
+.getElementById("search")
+.addEventListener(
+    "input",
+    render
+);
+
+
+/* Show covered */
+
+document
+.getElementById("covered")
+.addEventListener(
+"click",
+()=>{
+
+    showCovered =
+        !showCovered;
+
+
+    document.getElementById(
+        "covered"
+    ).textContent =
+        showCovered
+        ? "Show all"
+        : "Show covered";
+
+
+    render();
+
+});
+
+
+/* Reset */
+
+document
+.getElementById("reset")
+.addEventListener(
+"click",
+()=>{
+
+    if(
+        !confirm(
+            "Reset ALL GATE progress? This cannot be undone."
+        )
+    )
+        return;
+
+
+    state = {};
+
+    localStorage.removeItem(KEY);
+
+    render();
+
+});
+
+
+render();
+
+})();
+
 </script>
+
 </body>
 </html>
