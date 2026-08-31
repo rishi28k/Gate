@@ -1,1 +1,17 @@
-
+{
+  "name": "GATE Progress Tracker",
+  "short_name": "GATE Tracker",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f6fa",
+  "theme_color": "#1e3a5f",
+  "description": "Mobile GATE study progress tracker",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
